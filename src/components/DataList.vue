@@ -1,81 +1,48 @@
 <template>
-  <div class="container-fluid w-100">
-    <div class="row">
-      <div class="col-6">
-        <label for="customRange1" class="form-label">Storage</label>
+  <div class="container-fluid">
+    <h4 class="mt-3">Server List</h4>
+    <div class="row mt-4">
+      <div class="col-4">
+        <label class="form-label">Storage</label>
         <div class="d-flex">
-          <input type="range" class="form-range w-75" id="customRange1" step="1" min="1" max="12" @change="tranlasteSelectedStorage" v-model="filter.storage">
+          <input type="range"
+                 class="form-range w-75"
+                 step="1" min="0" 
+                 :max="Object.keys(filterData.storage).length"
+                 @change="tranlasteSelectedStorage"
+                 v-model="filter.storage">
           <span class="ms-2">{{ storageSelected }}</span>
         </div>
       </div>
-      <div class="col-6">
-        <label for="customRange1" class="form-label">Disk Type</label>
+      <div class="col-8">
+        <label class="form-label w-100">RAM</label>
+        <div class="form-check form-check-inline" v-for="value in filterData.ram">
+          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" :value="value" v-model="filter.ram">
+          <label class="form-check-label" for="inlineCheckbox1">{{ value }}GB</label>
+        </div>
+      </div>
+      
+    </div>
+    <div class="row mt-2">
+      <div class="col-2">
+        <label class="form-label">Disk Type</label>
         <select class="form-select" v-model="filter.disk_type">
           <option></option>
-          <option value="SAS">SAS</option>
-          <option value="SATA2">SATA</option>
-          <option value="SSD">SSD</option>
+          <option v-for="value in filterData.disk_types" :value="value">{{ value }}</option>
         </select>
       </div>
-    </div>
-    <div class="row mt-2" style="font-size: 12px">
-      <label for="customRange1" class="form-label">RAM</label>
-      <div class="col-12">
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="2" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">2GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="4" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">4GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="8" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">8GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="12" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">12GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="16" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">16GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="24" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">24GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="32" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">32GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="48" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">48GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="64" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">64GB</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="96" v-model="filter.ram">
-          <label class="form-check-label" for="inlineCheckbox1">96GB</label>
-        </div>
+      <div class="col-4">
+        <label class="form-label">Location</label>
+        <select class="form-select" v-model="filter.location">
+          <option></option>
+          <option v-for="(value, index) in filterData.locations" :value="value" :key="index">{{ value }}</option>
+        </select>
       </div>
     </div>
     <div class="row mt-2">
       <div class="col-6">
-        <label for="customRange1" class="form-label">Location</label>
-        <select class="form-select" v-model="filter.location">
-          <option></option>
-          <option value="AmsterdamAMS-01">AmsterdamAMS-01</option>
-          <option value="sata">DallasDAL-10</option>
-          <option value="ssd">Washington D.C.WDC-01</option>
-          <option value="ssd">SingaporeSIN-11</option>
-        </select>
-      </div>
-      <div class="col-6 mt-4">
-        <button class="btn btn-primary" @click="search">Filter</button>
+        <button class="btn btn-primary" type="button" @click="search">Filter</button>
+        <button class="btn btn-primary ms-2" type="button" @click="clearFilter">Clear Filter</button>
       </div>
     </div>
     <div class="row mt-3" v-if="compareList.length > 0">
@@ -141,6 +108,12 @@ export default {
     return {
       apiAccessToken: import.meta.env.VITE_ACCESS_API_TOKEN,
       dataList: null,
+      filterData: {
+        storage: [],
+        disk_types: [],
+        ram: [],
+        locations: []
+      },
       compareList: [],
       filter: {
         storage: null, 
@@ -148,25 +121,12 @@ export default {
         location: null, 
         ram: []
       },
-      storageSelected: 1,
-      storageMapping: {
-        1: '',
-        2: '240GB',
-        3: '480GB',
-        4: '1TB',
-        5: '2TB',
-        6: '3TB',
-        7: '4TB',
-        8: '8TB',
-        9: '12TB',
-        10: '24TB',
-        11: '48TB',
-        12: '72TB',
-      }
+      storageSelected: 0,
+      storageMapping: []
     }
   },
   methods: {
-    getData() {
+    fetchData() {
       fetch('http://docker.localhost/api/test', {
         headers: {
           "Authorization": "Bearer " + this.apiAccessToken
@@ -175,19 +135,27 @@ export default {
           .then(res => res.json())
           .then(res => this.dataList = res);
     },
-    tranlasteSelectedStorage (e) {
-      this.storageSelected = this.storageMapping[e.target.value];
+    fetchFilterData() {
+      fetch('http://docker.localhost/api/filter-data', {
+        headers: {
+          "Authorization": "Bearer " + this.apiAccessToken
+        },
+      })
+          .then(res => res.json())
+          .then(res => {
+            this.filterData = res
+            this.mapStorage()
+          });
     },
     search (e) {
       this.compareList = []
       let body = {
-        storage: this.storageSelected,
+        storage_alias: this.filter.storage ? this.storageSelected : null,
         disk_type: this.filter.disk_type,
         location: this.filter.location,
         ram: this.filter.ram,
       }
       let queryParams = new URLSearchParams(body).toString()
-      console.log(queryParams);
 
       fetch('http://docker.localhost/api/test?'+queryParams, {
         headers: {
@@ -197,8 +165,27 @@ export default {
       })
           .then(response => response.json())
           .then(response => {
+            console.log(response);
             this.dataList = response
-          })     
+          })
+    },
+    clearFilter() {
+      this.filter = {
+        storage: null,
+        disk_type: null,
+        location: null,
+        ram: []
+      }
+      this.search()
+    },
+    mapStorage () {
+      Object.entries(this.filterData.storage).sort((a, b) => {}).forEach((value) => {
+        this.storageMapping.push(value[0]);
+      });
+      this.tranlasteSelectedStorage()
+    },
+    tranlasteSelectedStorage () {
+      this.storageSelected = this.storageMapping[this.filter.storage];
     },
     addToComparison(e) {
       if (e.target.checked) {
@@ -207,12 +194,12 @@ export default {
         let indexToRemove = this.compareList.indexOf(this.dataList[e.target.value]);
         this.compareList.splice(indexToRemove, 1);
       }
-      console.log(e, this.dataList[e.target.value]);
     }
   },
   created() {
-    this.getData();
-    this.storageSelected = null;
+    this.fetchData();
+    this.fetchFilterData();
+    this.mapStorage();
   }
 }
 </script>
