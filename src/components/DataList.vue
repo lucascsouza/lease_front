@@ -107,6 +107,7 @@ export default {
   data() {
     return {
       apiAccessToken: import.meta.env.VITE_ACCESS_API_TOKEN,
+      baseURL: import.meta.env.VITE_API_BASE_URL,
       dataList: null,
       filterData: {
         storage: [],
@@ -127,7 +128,7 @@ export default {
   },
   methods: {
     fetchData() {
-      fetch('http://docker.localhost/api/test', {
+      fetch(this.baseURL + '/servers', {
         headers: {
           "Authorization": "Bearer " + this.apiAccessToken
         },
@@ -136,7 +137,7 @@ export default {
           .then(res => this.dataList = res)
     },
     fetchFilterData() {
-      fetch('http://docker.localhost/api/filter-data', {
+      fetch(this.baseURL + '/filter-data', {
         headers: {
           "Authorization": "Bearer " + this.apiAccessToken
         },
@@ -157,7 +158,7 @@ export default {
       }
       let queryParams = new URLSearchParams(body).toString()
 
-      fetch('http://docker.localhost/api/test?'+queryParams, {
+      fetch(this.baseURL + '/servers?' + queryParams, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer " + this.apiAccessToken
