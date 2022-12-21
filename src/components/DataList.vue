@@ -24,18 +24,18 @@
       
     </div>
     <div class="row mt-2">
-      <div class="col-2">
-        <label class="form-label">Disk Type</label>
-        <select class="form-select" v-model="filter.disk_type">
-          <option></option>
-          <option v-for="value in filterData.disk_types" :value="value">{{ value }}</option>
-        </select>
-      </div>
       <div class="col-4">
         <label class="form-label">Location</label>
         <select class="form-select" v-model="filter.location">
           <option></option>
           <option v-for="(value, index) in filterData.locations" :value="value" :key="index">{{ value }}</option>
+        </select>
+      </div>
+      <div class="col-2">
+        <label class="form-label">Disk Type</label>
+        <select class="form-select" v-model="filter.disk_type">
+          <option></option>
+          <option v-for="value in filterData.disk_types" :value="value">{{ value }}</option>
         </select>
       </div>
     </div>
@@ -121,7 +121,7 @@ export default {
         location: null, 
         ram: []
       },
-      storageSelected: 0,
+      storageSelected: null,
       storageMapping: []
     }
   },
@@ -133,7 +133,7 @@ export default {
         },
       })
           .then(res => res.json())
-          .then(res => this.dataList = res);
+          .then(res => this.dataList = res)
     },
     fetchFilterData() {
       fetch('http://docker.localhost/api/filter-data', {
@@ -145,7 +145,7 @@ export default {
           .then(res => {
             this.filterData = res
             this.mapStorage()
-          });
+          })
     },
     search (e) {
       this.compareList = []
@@ -165,11 +165,12 @@ export default {
       })
           .then(response => response.json())
           .then(response => {
-            console.log(response);
+            console.log(response)
             this.dataList = response
           })
     },
     clearFilter() {
+      this.storageSelected = null
       this.filter = {
         storage: null,
         disk_type: null,
@@ -180,26 +181,26 @@ export default {
     },
     mapStorage () {
       Object.entries(this.filterData.storage).sort((a, b) => {}).forEach((value) => {
-        this.storageMapping.push(value[0]);
-      });
+        this.storageMapping.push(value[0])
+      })
       this.tranlasteSelectedStorage()
     },
     tranlasteSelectedStorage () {
-      this.storageSelected = this.storageMapping[this.filter.storage];
+      this.storageSelected = this.storageMapping[this.filter.storage]
     },
     addToComparison(e) {
       if (e.target.checked) {
-        this.compareList.push(this.dataList[e.target.value]);
+        this.compareList.push(this.dataList[e.target.value])
       } else {
-        let indexToRemove = this.compareList.indexOf(this.dataList[e.target.value]);
-        this.compareList.splice(indexToRemove, 1);
+        let indexToRemove = this.compareList.indexOf(this.dataList[e.target.value])
+        this.compareList.splice(indexToRemove, 1)
       }
     }
   },
   created() {
-    this.fetchData();
-    this.fetchFilterData();
-    this.mapStorage();
+    this.fetchData()
+    this.fetchFilterData()
+    this.mapStorage()
   }
 }
 </script>
