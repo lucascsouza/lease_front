@@ -2,11 +2,11 @@
   <div class="container-fluid">
     <h4 class="mt-3">Server List</h4>
     <div class="row mt-4">
-      <div class="col-4">
+      <div class="col-12 col-md-4">
         <label class="form-label">Storage</label>
         <div class="d-flex">
           <input type="range"
-                 class="form-range w-75"
+                 class="form-range"
                  step="1" min="0" 
                  :max="Object.keys(filterData.storage).length"
                  @change="tranlasteSelectedStorage"
@@ -14,7 +14,7 @@
           <span class="ms-2">{{ storageSelected }}</span>
         </div>
       </div>
-      <div class="col-8">
+      <div class="col-12 col-md-8">
         <label class="form-label w-100">RAM</label>
         <div class="form-check form-check-inline" v-for="value in filterData.ram">
           <input class="form-check-input" type="checkbox" id="inlineCheckbox1" :value="value" v-model="filter.ram">
@@ -24,14 +24,14 @@
       
     </div>
     <div class="row mt-2">
-      <div class="col-4">
+      <div class="col-12 col-md-4">
         <label class="form-label">Location</label>
         <select class="form-select" v-model="filter.location">
           <option></option>
           <option v-for="(value, index) in filterData.locations" :value="value" :key="index">{{ value }}</option>
         </select>
       </div>
-      <div class="col-2">
+      <div class="col-12 col-md-2">
         <label class="form-label">Disk Type</label>
         <select class="form-select" v-model="filter.disk_type">
           <option></option>
@@ -39,15 +39,15 @@
         </select>
       </div>
     </div>
-    <div class="row mt-2">
-      <div class="col-6">
+    <div class="row mt-3">
+      <div class="col-12 col-6">
         <button class="btn btn-primary" type="button" @click="search">Filter</button>
         <button class="btn btn-primary ms-2" type="button" @click="clearFilter">Clear Filter</button>
       </div>
     </div>
     <div class="row mt-3" v-if="compareList.length > 0">
       <h6>Comparison Table</h6>
-      <div class="col-12">
+      <div class="col-12 table-responsive">
         <table class="table table-bordered table-hover w-100">
           <thead>
           <tr>
@@ -71,7 +71,7 @@
       </div>
     </div>
     <div class="row mt-3">
-      <div class="col-12">
+      <div class="col-12 table-responsive">
         <table class="table table-bordered table-hover w-100">
           <thead>
           <tr>
